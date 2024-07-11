@@ -1,4 +1,4 @@
-# 一、 使用Koa搭建服务的基建
+# 一、 服务器连接的基建搭建
 
 1.新建nodeKoa文件
 2.使用npm/pnpm/yarn初始化文件，执行yarn init
