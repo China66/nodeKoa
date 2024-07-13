@@ -2,116 +2,60 @@
 
 1.安装mysql
 2.检测mysql
-3.引入主体服务依赖Koa，yarn add koa
-4.新建main.js文件
+```open 终端
+mysql --version
 ```
-const Koa = require('koa');
-const app = new Koa();
-app.on('error',(error)=>{
-  console.log('serve启动fail',error)
-})
-app.listen(3000,()=>{
-  console.log('服务启动success！')
-})
+3.安装mysql的管理工具Navicat Preminum
 ```
-5.执行node main.js,检测服务是否启动ok
+缺点就是：断开后或者关闭app后，无法继续使用，需要重新卸载，重新安装
+优点：免费，绿色版
+```
+4.检测管理Tool连接数据库
+```
+```
 
-注意：直接在项目root文件下，和项目有些出入，下面会声明迁移
+# 二、集成数据操作之Sequelize
 
-# 二、服务基建的router建设
-1. 引入路由依赖，koa-router，yarn add koa-router
-2. 新建router文件，在router新建index.js,调用router
+1. 安装，yarn add sequelize mysql2 --dev
+2. 检测安装是否成功，打开package.json文件,是否存在下面代码
 ```
-const Router = require('koa-router');
-const route = new Router({
-  prefix:"/api"
-})
-route.post('/',(ctx,next) =>{
-  ctx.body = {
-    code:0,
-    message:"这是我的第一个api服务",
-    result:{}
+"devDependencies": {
+    "mysql2": "^3.10.2",
+    "sequelize": "^6.37.3"
   }
+```
+3. 在src/，创建seq的文件，在seq/下创建index.js
+
+```index.js
+const { Sequelize } = require("sequelize");
+const global = {
+  database: "数据库地址",
+  sqlUser: "数据账号名称",
+  sqlPassword: "账号密码"
+}
+const seq = new Sequelize(global.database,global.sqlUser,global.sqlPassword,{
+  dialect:"mysql2", // 数据库类型
+  host:"http://localhost:3000" // 我是使用过本地数据库，实际的业务直接切换为服务器的主机地址
 })
-module.exports = route;
 ```
-3.导入主服务进程文件main.js,并且注册路由
+
+4.检测，是否和数据建立通信,在src/seq/index.js继续添加检测code
+```src/seq/index.js
+const testConnect = async () =>{
+  try{
+    await seq.authenticate()
+    console.log("connect successful!")
+  }catch(error){
+    console.log("connect is error!",error)
+  }
+}
+testConnect() //测试完成后，注销
 ```
-...
-const route = require("./router/index.js");
-app.use(route.routes()).use(route.allowMethods());
+最后在终端执行：node src/seq/index.js 脚本
+
+5. 导出seq，在src/seq/index.js继续添加code
 ```
-4.测试，执行node ./main.js,打开postCode或者postMan调用api
+module.exports = seq;
+```
 
 # 三、服务基建的热更新建设
-1.添加nodemon，yarn add nodemon --dev
-2.配置被监控服对象，新建nodemon.json
-```
-{
-  "watch": ["src"],
-  "ext": "js,json",
-  "ignore": ["src/**/*.test.js"],
-  "exec": "node main.js"
-}
-```
-3.在package.json文件下，配置scripts属性
-```
-"scripts": {
-    "dev": "nodemon main.js"
-  },
-```
-4.检测结果，在终端执行 yarn dev，修改文件代码，通过console来验证
-
-# 四、服务基建的环境对象设置建设
-1.引入dotenv，yarn add dotenv --dev
-2.新建.env文件，设置环境变量
-3.测试，在main.js文件导入
-```
-const { HOST,APOR } = require('dotenv').config().parsed;
-console.log(HOST,APOR);
-```
-# 五、服务基建的body解析建设
-1. 引入koa-koa，yarn add koa-body
-2. 注册,在main.js文件下
-```
-...
-const koaBody = require('koa-body');
-app.use(koaBody())
-```
-3. 允许文件上传配置
-```
-...
-const koaBody = require('koa-body');
-app.use(koaBody({
-
-}))
-```
-4.测试，在postMan中，调用api，结合console将ctx.request打印出来，文件上传功能，就需要写文件上传的api，由于是基建这里就不实现出来
-
-# 六、服务基建的文件迁移
-1.在root文件创建src文件
-
-2.将非配置文件和非依赖文件移到src文件，比如上面步骤涉传健、app文件、main.js文件全部迁移，匹配项目
-
-3.修改上面步骤的执行或读取文件的路径，比如 node main.js 修改为node ./src/main.js
-
-4.对应配置文件的nodemon监控主服务的文件路径也要修改
-
-# 七、基础建设File结构
-```
-nodeKoa
-├─ .env
-├─ README.md
-├─ nextWrite.md
-├─ nodemon.json
-├─ package.json
-├─ src
-│  ├─ app
-│  │  └─ index.js
-│  ├─ main.js
-│  └─ router
-│     ├─ index.js
-│     └─ text.route.js
-└─ yarn.lock
-
-```
