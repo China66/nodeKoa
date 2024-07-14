@@ -69,23 +69,79 @@ module.exports = seq;
 ```
 
 # 三、连接数据库服务基建搭建模型（创建表）
-1. 创建文件， 导入通信对象
-
+1. 创建文件model/user.model.js， 导入通信对象
+```user.model.js
+const seq = require("./../seq/index");
+const { DataTypes } = require("sequelize"); // 对model的属性定义类型
+```
 2. 创建模型，定义模型属性
+```user.model.js
+const userRegister = seq.define("zdev_users",{
+  user_name:{
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+    comment: "用户注册的账号名称"
+  },
+  password: {
+    type: DataTypes.CHAR(11),
+    allowNull: false,
+    comment:"密码"
+  },
+  is_admin:{
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: 0,
+    comment:"是否为管理员"
+  }
+})
+userRegister.sync({
+  focus: true
+}) //
+```
+打开终端，执行： node ./src/model/user.model.js
 
 3. 检测
-
+打开数据库管理UI工具，点开数据库zdev可以看到名为zdev_users的用户表;这里不做展示；
 4. 导出
+```user.model.js
+
+...
+<!-- userRegister.sync({
+  focus: true
+})  --> //这是同步传健表格，已经创建所有没必要再去重复执行，创建成功后直接注销
+module.exports = userRegister;
+```
 
 # 四、服务基建之使用模型的增、删、查、改
+下面的操作，是在创建了src/serve/user.serve.js下进行；
 1. 增
 ```src/serve/user.serve.js
-
+const  userRegister = require("./../model/user.model");
+class userServe {
+  async createUser (user_name="小花",password = "12345678"){ //
+    try{
+      const res = await userRegister.create({
+        user_name,
+        password
+      })
+      return res? res.dataValues : null
+    }catch(error){
+      console.log("error",error)
+    }
+  }
+}
 ```
 1.2 增,检测结果
-```在终端输出
+```src/serve/user.serve.js
+...
+const userServeTest = new userServe()
+userServeTest.userServeTest("小花","12345678") 
 
 ```
+在终端，执行：node src/serve/user.serve.js，结果可以先看终端是否报错，在看数据库的管理工具的数据表是否已经入库，如果有就证明已经入库成功，如果没有，看打印出来的错误提示
+
+
 2. 删
 ```src/serve/user.serve.js
 ```
@@ -132,7 +188,7 @@ module.exports = seq;
 # 七、项目的文件结构
 
 
-提示：这个分支涉及较深的业务逻辑，所有不会有control层和middleWare，会下个终极分支涉及到
+提示：这个分支涉及较深的业务逻辑，所有不会有control层和middleWare，会下个终极分支涉及到,还会涉及一些功能性业务（方便项目结构优化）
 
 
 
