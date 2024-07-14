@@ -1,12 +1,13 @@
 const { Sequelize } = require("sequelize");
 const global = {
-  database: "数据库地址",
-  sqlUser: "数据账号名称",
-  sqlPassword: "账号密码"
+  database: "zdev",
+  sqlUser: "root",
+  sqlPassword: "12345678",
+  host:"localhost"
 }
 const seq = new Sequelize(global.database,global.sqlUser,global.sqlPassword,{
-  dialect:"mysql2", // 数据库类型
-  host:"http://localhost:3000" // 我是使用过本地数据库，实际的业务直接切换为服务器的主机地址
+  host: global.host,// 我是使用过本地数据库，实际的业务直接切换为服务器的主机地址
+  dialect:"mysql" // 数据库类型
 })
 const testConnect = async () =>{
   try{
