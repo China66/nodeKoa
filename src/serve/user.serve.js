@@ -24,6 +24,18 @@ class userServe {
       console.log("error",error)
     }
   }
+  async updateById({ id, user_name, password, is_admin }) { // 复用性
+    const res = await userRegister.update({
+      user_name,
+      password,
+      id_admin
+    }, {
+      where: {
+        id
+      },
+    });
+    return res[0] > 0 ? true : false;
+  }
   // 很少了有删除客户的操作，这里拿来做案例
   async destroyUser(user_id,is_admin){
     try{
