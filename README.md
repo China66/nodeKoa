@@ -144,26 +144,64 @@ userServeTest.userServeTest("小花","12345678")
 
 2. 删
 ```src/serve/user.serve.js
+...
+// 很少了有删除客户的操作，这里拿来做案例
+  async destroyUser(destroy_user_id,user_id,is_admin){
+    try{
+      if(!is_admin){
+        return {
+          message: "非管理员无法删除客户"
+        }
+      }
+      const res = userRegister.destroy({
+        where:{
+          id: destroy_user_id
+        }
+      })
+      return res > 0 ? true : false
+    }catch(error){
+      console.log("error",error)
+    }
+  }
 ```
 2.1 删,检测结果（两种检测方式，为了具体呈现出来，所有现在中，不是说另一种不能具像化出来，而是不方便我编写）
-```在终端输出
-
-```
-2.2 删，软删除
 ```src/serve/user.serve.js
+...
+const userServeTest = new userServe()
+userServeTest.destroyUser(1,2,true) // 1:用户笑话的id;2为管理员小棒的id;true小棒的是不是管理员
+/**
+  destroy_id:被删除的用户数据id
+  id: 删除使用操作的管理员id
+  admin: 判断该操作用户是否为管理员
+  实操的时候：自己打开数据库数据表，直接拿表上的数据操作
+*/
 ```
-2.3 删，软删除,检测结果
-```在终端输出
-
-```
+在终端，执行：node src/serve/user.serve.js，结果可以先看终端是否报错，在看数据库的管理工具的数据表是否已经删除，如果有就证明已经删除成功，如果没有，看打印出来的错误提示
 
 3. 查
 ```src/serve/user.serve.js
+...
+async findUser(id,user_name,password,is_admin){ // user_name,password,is_admin可以不用传递
+    try{
+      // 实际在做些数据库操作之前，都会做一个参数校验
+      // 这里没有做，是因为这里是基础部分，会在实际功能业务上输出
+      const res = userRegister.findOne({
+        attributes:["id","user_name","password","is_admin"],
+        where:{id}
+      })
+      return res[0] ? res.dataValues : null
+    }catch(error){
+      console.log("error",error)
+    }
+  }
 ```
 3.1 查,检测结果
-```在终端输出
-
+```src/serve/user.serve.js
+...
+const userServeTest = new userServe()
+userServeTest.findUser(1) // 查询id为1的用户数据
 ```
+在终端，执行：node src/serve/user.serve.js，结果可以先看终端是否报错，在看数据库的管理工具的数据表是否已经删除，如果有就证明已经删除成功，如果没有，看打印出来的错误提示
 
 4. 改
 ```src/serve/user.serve.js
